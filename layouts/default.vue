@@ -153,9 +153,27 @@ export default {
     }
   },
   created() {
+    //获取路径里面token值用于微信登录，this.$route.query.用于访问路径中的?中参数
+    this.token = this.$route.query.token
+    if (this.token) {
+      this.wxlogin()
+    }
+
     this.showInfo()
   },
   methods: {
+    //微信登录显示的方法
+    wxlogin() {
+      //把token值放到cookie里
+      cookie.set("member_token", this.token, {domain: 'localhost'})
+      cookie.set('memberinfo', '', {domain: 'localhost'})
+      //调用接口根据token值获取用户信息
+      login.getMemberInfo()
+        .then(response => {
+          this.loginInfo = response.data.data.memberInfo
+           cookie.set('memberinfo', this.loginInfo, {domain: 'localhost'})
+        })
+    },
     //从cookie中获取用户信息
     showInfo() {
       var memberInfo = cookie.get('memberinfo') //这里是字符串即："{name:sher,age:23}"这种形式
